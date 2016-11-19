@@ -1,0 +1,10 @@
+twisted
+pysnmp
+Django == 1.10
+psycopg2
+Paramiko
+scp
+netmiko
+pymongo
+requests
+docker-py
