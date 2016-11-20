@@ -13,9 +13,16 @@ class DataBaseImageAdmin(admin.ModelAdmin):
 
 
 class DataBaseAdmin(admin.ModelAdmin):
-    list_display = ("name", "application","databaseImage","numberOfInstanse")
-    search_fields = ["name"]
-    list_filter = ["application"]
+    list_display = ("name",
+                    "application",
+                    "databaseImage",
+                    "numberOfInstance",
+                    "hostVolumePath",
+                    "containerVolumePath")
+
+    search_fields = ["name","application"]
+    list_filter = ["application","databaseImage"]
+
 
 admin.site.register(Application,ApplicationAdmin)
 admin.site.register(DataBase,DataBaseAdmin)

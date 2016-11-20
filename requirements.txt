@@ -1,4 +1,3 @@
-twisted
 pysnmp
 Django == 1.10
 psycopg2
@@ -8,3 +7,4 @@ netmiko
 pymongo
 requests
 docker-py
+tornado

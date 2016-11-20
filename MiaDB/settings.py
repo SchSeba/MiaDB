@@ -29,6 +29,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+DOCKER_MANAGER_IP = os.getenv("DOCKER_MANAGER_IP")
+DOCKER_MANAGER_PORT = os.getenv("DOCKER_MANAGER_PORT")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'CreateDB',
+    'DockerConfig',
 ]
 
 MIDDLEWARE = [
