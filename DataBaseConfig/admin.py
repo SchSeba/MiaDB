@@ -7,11 +7,6 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
 
-class DataBaseImageAdmin(admin.ModelAdmin):
-    list_display = ("name", "explain",)
-    search_fields = ["name"]
-
-
 class DataBaseAdmin(admin.ModelAdmin):
     list_display = ("name",
                     "application",
@@ -26,4 +21,3 @@ class DataBaseAdmin(admin.ModelAdmin):
 
 admin.site.register(Application,ApplicationAdmin)
 admin.site.register(DataBase,DataBaseAdmin)
-admin.site.register(DataBaseImage,DataBaseImageAdmin)

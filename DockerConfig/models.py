@@ -16,5 +16,17 @@ class EnvironmentVariable(models.Model):
     variableName = models.CharField(max_length=120)
     variableValue = models.TextField()
 
+    def __unicode__(self):
+        return self.variableName
+
     class Meta:
         unique_together = ('DataBaseImage', 'variableName',)
+
+
+class DeploymentConfig(models.Model):
+    name = models.CharField(max_length=150, unique=True, db_index=True)
+    dataBaseImage = models.ForeignKey(DataBaseImage)
+    config = models.TextField()
+
+    def __unicode__(self):
+        return self.name
