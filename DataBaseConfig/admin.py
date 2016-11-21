@@ -3,21 +3,15 @@ from models import *
 
 
 # Register your models here.
-class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-
-
 class DataBaseAdmin(admin.ModelAdmin):
-    list_display = ("name",
-                    "application",
-                    "databaseImage",
-                    "numberOfInstance",
+    list_display = ("applicationName",
+                    "dbName",
+                    "deploymentConfig",
                     "hostVolumePath",
                     "containerVolumePath")
 
-    search_fields = ["name","application"]
-    list_filter = ["application","databaseImage"]
+    search_fields = ["applicationName"]
+    list_filter = ["applicationName","deploymentConfig"]
 
 
-admin.site.register(Application,ApplicationAdmin)
 admin.site.register(DataBase,DataBaseAdmin)

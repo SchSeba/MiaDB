@@ -24,13 +24,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '$@b=oc6^h*%_s1%o6e6b2)fwmpzcs=t40go59jche$mhnq#uf#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if os.getenv("MIADBPROD"):
+    DEBUG = False
+else:
+    DEBUG = True
+
 
 ALLOWED_HOSTS = []
-
-
-DOCKER_MANAGER_IP = os.getenv("DOCKER_MANAGER_IP")
-DOCKER_MANAGER_PORT = os.getenv("DOCKER_MANAGER_PORT")
 
 # Application definition
 

@@ -3,16 +3,7 @@ from django.db import models
 
 
 # Create your models here.
-class DataBaseImage(models.Model):
-    name = models.CharField(max_length=150,unique=True, db_index=True)
-    explain = models.TextField()
-
-    def __unicode__(self):
-        return self.name
-
-
 class EnvironmentVariable(models.Model):
-    DataBaseImage = models.ForeignKey(DataBaseImage)
     variableName = models.CharField(max_length=120)
     variableValue = models.TextField()
 
@@ -20,13 +11,13 @@ class EnvironmentVariable(models.Model):
         return self.variableName
 
     class Meta:
-        unique_together = ('DataBaseImage', 'variableName',)
+        unique_together = ('variableName', 'variableValue',)
 
 
 class DeploymentConfig(models.Model):
     name = models.CharField(max_length=150, unique=True, db_index=True)
-    dataBaseImage = models.ForeignKey(DataBaseImage)
-    config = models.TextField()
+    dataBaseImageName = models.CharField(max_length=150)
+    environmentVariable = models.ManyToManyField(EnvironmentVariable)
 
     def __unicode__(self):
         return self.name

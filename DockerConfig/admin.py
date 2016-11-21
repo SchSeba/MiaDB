@@ -3,22 +3,16 @@ from .models import *
 
 
 # Register your models here.
-class DataBaseImageAdmin(admin.ModelAdmin):
-    list_display = ("name", "explain",)
-    search_fields = ["name"]
-
-
 class EnvironmentVariableAdmin(admin.ModelAdmin):
-    list_display = ("DataBaseImage","variableName","variableValue")
-    search_fields = ["DataBaseImage"]
+    list_display = ("variableName","variableValue")
+    search_fields = ["variableName"]
 
 
 class DeploymentConfigAdmin(admin.ModelAdmin):
-    list_display = ("name","dataBaseImage")
-    search_fields = ["name","dataBaseImage"]
-    list_filter = ["dataBaseImage"]
+    list_display = ("name","dataBaseImageName")
+    search_fields = ["name","dataBaseImageName"]
+    list_filter = ["dataBaseImageName"]
 
 
-admin.site.register(DataBaseImage,DataBaseImageAdmin)
 admin.site.register(EnvironmentVariable,EnvironmentVariableAdmin)
 admin.site.register(DeploymentConfig,DeploymentConfigAdmin)
