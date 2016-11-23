@@ -46,13 +46,12 @@ def Deploy(self,request):
           parameters["IPADDRSEQ" + str(seq.sequence)] = ipddr
           parameters["DNSSEQ" + str(seq.sequence)] = instanceDNS + "-" + str(seq.sequence)
           parameters["SEQ"] = str(seq.sequence)
-
           logger.debug("End Server Creation")
 
           logger.debug("Start Ansible Playbook")
           playbook = seq.instanceType.ansiblePlaybook
-
-
+          for key in parameters.keys():
+              playbook.replace("{{" + key + "}}",parameters[key])
 
           ansible.RunPlayBook(instanceDNS, playbook)
 
