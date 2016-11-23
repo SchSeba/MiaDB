@@ -15,11 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from DataBase import urls as DataBaseUrl
-from Deploy import urls as DeployUrl
+from DataBase import urls as DataBaseUrls
 
 urlpatterns = [
-    url(r'DataBase/', include(DataBaseUrl)),
+    url(r'DataBase/', include(DataBaseUrls)),
     url(r'^admin/', admin.site.urls),
-    url(r'^', include(DeployUrl))
+
 ]

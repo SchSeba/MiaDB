@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'DataBase',
+    'DataBaseConfig',
+    'DockerConfig',
     'Deploy',
 ]
 
@@ -125,22 +126,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
-# MiaDB CommunicationClass
-from Communication.DockerConnector import *
-from Communication.OpenStackConnector import *
-from Communication.AnsibleConnector import *
-
-DockerManagerIp = os.getenv("DockerManagerIp","127.0.0.1")
-DockerManagerPort = os.getenv("DockerManagerPort","2376")
-docker = DockerConnector(DockerManagerIp,DockerManagerPort)
-
-OpenStackManagerIp = os.getenv("OpenStackManagerIp","127.0.0.1")
-OpenStackManagerPort = os.getenv("OpenStackManagerPort","443")
-openStack = OpenStackConnector(OpenStackManagerIp,OpenStackManagerPort)
-
-ansible = AnsibleConnector()
 
 LOGGING = {
     'version': 1,
