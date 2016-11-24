@@ -13,16 +13,17 @@ class DeploySequenceAdmin(admin.ModelAdmin):
     list_filter = ["deployPlan","instanceType"]
 
 class ClusterAdmin(admin.ModelAdmin):
-    list_display = ("dns","vendor","createDate")
-    search_fields = ["dns","vendor"]
+    list_display = ("dns","ip","vendor","createDate")
+    search_fields = ["dns","ip","vendor"]
     list_filter = ["vendor"]
 
 class NodeAdmin(admin.ModelAdmin):
-    list_display = ("dns","cluster")
-    search_fields = ["dns"]
-    list_filter = ["cluster"]
+    list_display = ("dns","ip","cluster","instanceType")
+    search_fields = ["dns", "ip"]
+    list_filter = ["cluster","instanceType"]
 
 
 admin.site.register(DeployPlan,DeployPlanAdmin)
+admin.site.register(DeploySequence,DeploySequenceAdmin)
 admin.site.register(Cluster,ClusterAdmin)
 admin.site.register(Node,NodeAdmin)
