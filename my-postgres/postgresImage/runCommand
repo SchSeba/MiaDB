@@ -1,0 +1,19 @@
+docker service create -e CLUSTER_NAME=pg_cluster /
+                      -e REPLICATION_DB=replication_db /
+                      -e REPLICATION_USER=replication_user /
+                      -e REPLICATION_PASSWORD=replication_pass /
+                      -e NODE_ID=1 /
+                      -e NODE_NAME=node1 /
+                      -e POSTGRES_PASSWORD=monkey_pass /
+                      -e POSTGRES_USER=monkey_user /
+                      -e POSTGRES_DB=monkey_db /
+                      -e INITIAL_NODE_TYPE=master my-postgres
+
+
+docker service create -e CLUSTER_NAME=pg_cluster /
+                      -e REPLICATION_DB=replication_db /
+                      -e REPLICATION_USER=replication_user /
+                      -e REPLICATION_PASSWORD=replication_pass /
+                      -e NODE_ID=2 /
+                      -e NODE_NAME=node2 /
+                      -e INITIAL_NODE_TYPE=standby my-postgres

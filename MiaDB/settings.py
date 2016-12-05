@@ -86,7 +86,17 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'monkey_db',
+#         'USER': 'monkey_user',
+#         'PASSWORD': 'monkey_pass',
+#         'HOST': '192.168.1.111',
+#         'PORT': '5430',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
