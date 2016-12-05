@@ -1,3 +1,6 @@
+docker build -t my-postgres -f Pgsql.Dockerfile .
+docker build -t pgpool -f Pgpool.Dockerfile .
+
 docker service create -e CLUSTER_NAME=pg_cluster /
                       -e REPLICATION_DB=replication_db /
                       -e REPLICATION_USER=replication_user /
@@ -28,3 +31,16 @@ docker service create -e CLUSTER_NAME=pg_cluster /
                       --network my-net /
 		              --name pgnode1 /
 					  my-postgres
+					  
+docker service create -e PCP_USER=pcp_user /
+                      -e PCP_PASSWORD=pcp_pass /
+                      -e REPLICATION_USER=replication_user /
+                      -e REPLICATION_PASSWORD=replication_pass /
+					  -e DB_USERS=monkey_user:monkey_pass /
+					  -e BACKENDS="0:pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:pgnode2:2:::ALLOW_TO_FAILOVER" /
+					  -e CONFIGS="num_init_children:250,max_pool:4,search_primary_node_timeout:5"
+					  -p 5432:5432 /
+					  -p 9898:9898 /
+					  --network my-net /
+		              --name pgpool /
+					  pgpool

@@ -5,7 +5,6 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update
 RUN apt-get install -y postgresql-server-dev-9.6
 RUN apt-get install -y postgresql-9.6-repmgr
-RUN apt-get install -y python-pip
 
 
 COPY ./bin /usr/local/bin/cluster
