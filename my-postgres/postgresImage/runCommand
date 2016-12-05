@@ -7,7 +7,12 @@ docker service create -e CLUSTER_NAME=pg_cluster /
                       -e POSTGRES_PASSWORD=monkey_pass /
                       -e POSTGRES_USER=monkey_user /
                       -e POSTGRES_DB=monkey_db /
-                      -e INITIAL_NODE_TYPE=master my-postgres
+                      -e INITIAL_NODE_TYPE=master /
+					  -e CLUSTER_NODE_NETWORK_NAME=pgnode1 /
+					  --mount type=bind,src=/root/pgnode1/data,dst=/var/lib/postgresql/data /
+                      --network my-net /
+					  --name pgnode1 /
+					  my-postgres
 
 
 docker service create -e CLUSTER_NAME=pg_cluster /
@@ -16,4 +21,10 @@ docker service create -e CLUSTER_NAME=pg_cluster /
                       -e REPLICATION_PASSWORD=replication_pass /
                       -e NODE_ID=2 /
                       -e NODE_NAME=node2 /
-                      -e INITIAL_NODE_TYPE=standby my-postgres
+					  -e REPLICATION_PRIMARY_HOST=pgnode1 /
+					  -e CLUSTER_NODE_NETWORK_NAME=pgnode2 /
+                      -e INITIAL_NODE_TYPE=standby /
+					  --mount type=bind,src=/root/pgnode2/data,dst=/var/lib/postgresql/data /
+                      --network my-net /
+		              --name pgnode1 /
+					  my-postgres
