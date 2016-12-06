@@ -12,8 +12,7 @@ class Vendor(models.Model):
 
 class Image(models.Model):
     name = models.CharField(max_length=120, unique=True)
-    imageName = models.CharField(max_length=120)
-    dokerFile = models.TextField()
+    serviceYaml = models.TextField()
     vendor = models.ForeignKey(Vendor)
 
     def __unicode__(self):

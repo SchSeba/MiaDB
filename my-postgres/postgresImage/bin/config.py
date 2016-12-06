@@ -17,6 +17,9 @@ def StartPostGresServer():
 def ChangePriv():
     RunCommand("chown -R postgres $PGDATA")
     RunCommand("chmod -R 0700 $PGDATA")
+    RunCommand("chown -R postgres /var/lib/postgresql/archive/")
+    RunCommand("chmod -R 0700 /var/lib/postgresql/archive/")
+
     RunCommand("chown postgres /master")
     RunCommand("chmod 0700 /master")
 
@@ -81,9 +84,9 @@ def RunCommand(command,env=os.environ):
     p_status = p.wait()
 
     print ("Command output : ", output)
-    print ("Command exit status/return code : ", p_status)
 
     return output
+
 
 if __name__ == "__main__":
     StartPostGresServer()

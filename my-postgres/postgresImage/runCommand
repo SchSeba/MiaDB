@@ -33,7 +33,7 @@ docker service create -e CLUSTER_NAME=pg_cluster \
                       -e INITIAL_NODE_TYPE=standby \
 					  --mount type=bind,src=/root/test/pgnode2/data,dst=/var/lib/postgresql/data \
                                           --mount type=bind,src=/root/test/master,dst=/master \
-					  --mount type=bind,src=/root/test/archive,dst=/var/lib/postgresql/archive \
+					  --mount type=bind,src=/root/test/pgnode2/archive,dst=/var/lib/postgresql/archive \
                       --network my-net \
 		              --name pgnode2 \
 					  my-postgres
@@ -50,7 +50,7 @@ docker service create -e CLUSTER_NAME=pg_cluster \
                       -e INITIAL_NODE_TYPE=standby \
 					  --mount type=bind,src=/root/test/pgnode3/data,dst=/var/lib/postgresql/data \
                                           --mount type=bind,src=/root/test/master,dst=/master \
-					  --mount type=bind,src=/root/test/archive,dst=/var/lib/postgresql/archive \
+					  --mount type=bind,src=/root/test/pgnode3/archive,dst=/var/lib/postgresql/archive \
                       --network my-net \
 		              --name pgnode3 \
 					  my-postgres
@@ -65,6 +65,7 @@ docker service create -e PCP_USER=pcp_user \
 					  -p 5432:5432 \
 					  -p 9898:9898 \
 					  --network my-net \
+                                          --replicas 2 \
 		              --name pgpool \
 					  pgpool
 
