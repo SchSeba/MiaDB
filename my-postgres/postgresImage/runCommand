@@ -1,46 +1,70 @@
 docker build -t my-postgres -f Pgsql.Dockerfile .
 docker build -t pgpool -f Pgpool.Dockerfile .
 
-docker service create -e CLUSTER_NAME=pg_cluster /
-                      -e REPLICATION_DB=replication_db /
-                      -e REPLICATION_USER=replication_user /
-                      -e REPLICATION_PASSWORD=replication_pass /
-                      -e NODE_ID=1 /
-                      -e NODE_NAME=node1 /
-                      -e POSTGRES_PASSWORD=monkey_pass /
-                      -e POSTGRES_USER=monkey_user /
-                      -e POSTGRES_DB=monkey_db /
-                      -e INITIAL_NODE_TYPE=master /
-					  -e CLUSTER_NODE_NETWORK_NAME=pgnode1 /
-					  --mount type=bind,src=/root/pgnode1/data,dst=/var/lib/postgresql/data /
-                      --network my-net /
-					  --name pgnode1 /
+docker service create -e CLUSTER_NAME=pg_cluster \
+                      -e REPLICATION_DB=replication_db \
+                      -e REPLICATION_USER=replication_user \
+                      -e REPLICATION_PASSWORD=replication_pass \
+                      -e REPLICATION_PRIMARY_PORT=5432 \
+                      -e NODE_ID=1 \
+                      -e NODE_NAME=node1 \
+                      -e POSTGRES_PASSWORD=monkey_pass \
+                      -e POSTGRES_USER=monkey_user \
+                      -e POSTGRES_DB=monkey_db \
+                      -e INITIAL_NODE_TYPE=master \
+					  -e CLUSTER_NODE_NETWORK_NAME=pgnode1 \
+					  --mount type=bind,src=/root/test/pgnode1/data,dst=/var/lib/postgresql/data \
+					  --mount type=bind,src=/root/test/master,dst=/master \
+					  --mount type=bind,src=/root/test/pgnode1/archive,dst=/var/lib/postgresql/archive \
+                      --network my-net \
+					  --name pgnode1 \
 					  my-postgres
 
 
-docker service create -e CLUSTER_NAME=pg_cluster /
-                      -e REPLICATION_DB=replication_db /
-                      -e REPLICATION_USER=replication_user /
-                      -e REPLICATION_PASSWORD=replication_pass /
-                      -e NODE_ID=2 /
-                      -e NODE_NAME=node2 /
-					  -e REPLICATION_PRIMARY_HOST=pgnode1 /
-					  -e CLUSTER_NODE_NETWORK_NAME=pgnode2 /
-                      -e INITIAL_NODE_TYPE=standby /
-					  --mount type=bind,src=/root/pgnode2/data,dst=/var/lib/postgresql/data /
-                      --network my-net /
-		              --name pgnode1 /
+docker service create -e CLUSTER_NAME=pg_cluster \
+                      -e REPLICATION_DB=replication_db \
+                      -e REPLICATION_USER=replication_user \
+                      -e REPLICATION_PASSWORD=replication_pass \
+                      -e REPLICATION_PRIMARY_PORT=5432 \
+                      -e NODE_ID=2 \
+                      -e NODE_NAME=node2 \
+					  -e REPLICATION_PRIMARY_HOST=pgnode1 \
+					  -e CLUSTER_NODE_NETWORK_NAME=pgnode2 \
+                      -e INITIAL_NODE_TYPE=standby \
+					  --mount type=bind,src=/root/test/pgnode2/data,dst=/var/lib/postgresql/data \
+                                          --mount type=bind,src=/root/test/master,dst=/master \
+					  --mount type=bind,src=/root/test/archive,dst=/var/lib/postgresql/archive \
+                      --network my-net \
+		              --name pgnode2 \
+					  my-postgres
+
+docker service create -e CLUSTER_NAME=pg_cluster \
+                      -e REPLICATION_DB=replication_db \
+                      -e REPLICATION_USER=replication_user \
+                      -e REPLICATION_PASSWORD=replication_pass \
+                      -e REPLICATION_PRIMARY_PORT=5432 \
+                      -e NODE_ID=3 \
+                      -e NODE_NAME=node3 \
+					  -e REPLICATION_PRIMARY_HOST=pgnode1 \
+					  -e CLUSTER_NODE_NETWORK_NAME=pgnode3 \
+                      -e INITIAL_NODE_TYPE=standby \
+					  --mount type=bind,src=/root/test/pgnode3/data,dst=/var/lib/postgresql/data \
+                                          --mount type=bind,src=/root/test/master,dst=/master \
+					  --mount type=bind,src=/root/test/archive,dst=/var/lib/postgresql/archive \
+                      --network my-net \
+		              --name pgnode3 \
 					  my-postgres
 					  
-docker service create -e PCP_USER=pcp_user /
-                      -e PCP_PASSWORD=pcp_pass /
-                      -e REPLICATION_USER=replication_user /
-                      -e REPLICATION_PASSWORD=replication_pass /
-					  -e DB_USERS=monkey_user:monkey_pass /
-					  -e BACKENDS="0:pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:pgnode2:2:::ALLOW_TO_FAILOVER" /
-					  -e CONFIGS="num_init_children:250,max_pool:4,search_primary_node_timeout:5"
-					  -p 5432:5432 /
-					  -p 9898:9898 /
-					  --network my-net /
-		              --name pgpool /
+docker service create -e PCP_USER=pcp_user \
+                      -e PCP_PASSWORD=pcp_pass \
+                      -e REPLICATION_USER=replication_user \
+                      -e REPLICATION_PASSWORD=replication_pass \
+					  -e DB_USERS=monkey_user:monkey_pass \
+					  -e BACKENDS="0:pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:pgnode2:5432:2:::ALLOW_TO_FAILOVER,2:pgnode3:5432:3:::ALLOW_TO_FAILOVER" \
+					  -e CONFIGS="num_init_children:250,max_pool:4,search_primary_node_timeout:5" \
+					  -p 5432:5432 \
+					  -p 9898:9898 \
+					  --network my-net \
+		              --name pgpool \
 					  pgpool
+
