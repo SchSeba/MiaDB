@@ -60,12 +60,11 @@ docker service create -e PCP_USER=pcp_user \
                       -e REPLICATION_USER=replication_user \
                       -e REPLICATION_PASSWORD=replication_pass \
 					  -e DB_USERS=monkey_user:monkey_pass \
-					  -e BACKENDS="0:pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:pgnode2:5432:2:::ALLOW_TO_FAILOVER,2:pgnode3:5432:3:::ALLOW_TO_FAILOVER" \
+					  -e BACKENDS="0:pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:pgnode2:5432:2:::ALLOW_TO_FAILOVER," \
 					  -e CONFIGS="num_init_children:250,max_pool:4,search_primary_node_timeout:5" \
 					  -p 5432:5432 \
 					  -p 9898:9898 \
 					  --network my-net \
-                                          --replicas 2 \
+                      --replicas 2 \
 		              --name pgpool \
 					  pgpool
-
