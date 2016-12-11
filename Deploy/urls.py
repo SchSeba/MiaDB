@@ -17,8 +17,8 @@ from django.conf.urls import url
 from views import *
 
 urlpatterns = [
-    url(r'GetClusterInfo/(?P<ClusterDNS>\w+)/$',Cluster.as_view(),name="GetClusterInfo"),
+    # url(r'GetClusterInfo/(?P<ClusterDNS>\w+)/$',Cluster.as_view(),name="GetClusterInfo"),
     url(r'GetDeployPlans/$',GetDeployPlans,name="GetDeployPlans"),
     url(r'GetDeployPlan/(?P<DeploymentName>\w+)/$', GetDeployPlan, name="GetDeployPlan"),
-    url(r'DeployPlan/$',Deploy,name="Deploy")
+    url(r'Deploy/$',Deploy,name="Deploy")
 ]

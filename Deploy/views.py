@@ -1,12 +1,14 @@
 from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.views import View
+from django.template import Template, Context
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from MiaDB.settings import docker,openStack,ansible
+from Communication.DockerConnector import *
+from Communication.DockerComposer import *
 from models import *
+
 import logging
 import json
+import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -21,50 +23,60 @@ def GetDeployPlan(request,DeploymentName):
 
 
 """
-DNS: Dns for the Cluster
-DeploymentPlan: Name For the Deployment Plan
-Vendor: DataBase Vendor(type)
-Project: DataBase project owner
-IP: IP addr from the vip
+projectName: Dns for the Cluster
+deployPlan: Name For the Deployment Plan
+swarmCluster: name of swarm cluster
+params: directory of parameters
 """
 @csrf_exempt
-def Deploy(self,request):
-  try:
-      data = json.loads(request.body)
-      logger.debug("Get DeploymentPlan " + data["DeploymentPlan"])
-      deployPlan = DeployPlan.objects.get(name=data["DeploymentPlan"])
-      deploySeq = DeploySequence.objects.filter(deployPlan=deployPlan).order_by("-sequence")
-      instanceDNS = data["DNS"]
+def Deploy(request):
+    if request.method == "POST":
+        try:
+            logger.info("Load json data")
+            data = json.loads(request.body)
+            logger.debug(data)
 
-      newCluster = Cluster.objects.create(dns=instanceDNS+"-vip",ip=data["IP"],vendor=Vendor.objects.get(name=data["Vendor"]))
-      newCluster.save()
-      parameters = {"PROJECT":data["Project"]}
+            if SwarmCluster.objects.filter(name=data["swarmCluster"]).__len__() == 0:
+                raise Exception("Swarm Cluster doesnt exist")
 
-      for seq in deploySeq:
-          logger.debug("Start Server Creation for DNS " + instanceDNS + " with image " + seq.instanceType.imageName)
-          ipddr = openStack.CreateServer(instanceDNS + "-" + str(seq.sequence), seq.instanceType.imageName)
-          parameters["IPADDRSEQ" + str(seq.sequence)] = ipddr
-          parameters["DNSSEQ" + str(seq.sequence)] = instanceDNS + "-" + str(seq.sequence)
-          parameters["SEQ"] = str(seq.sequence)
-          logger.debug("End Server Creation")
+            elif DeployPlan.objects.filter(name=data["deployPlan"]).__len__() == 0:
+                raise Exception("DeployPlan doesnt exist")
 
-          logger.debug("Start Ansible Playbook")
-          playbook = seq.instanceType.ansiblePlaybook
-          for key in parameters.keys():
-              playbook.replace("{{" + key + "}}",parameters[key])
+            elif Deployment.objects.filter(projectName=data["projectName"],
+                                           swarm=SwarmCluster.objects.get(name=data["swarmCluster"]),
+                                           deployPlan=DeployPlan.objects.get(name=data["deployPlan"])).__len__() != 0:
+                raise Exception("Project Already exist")
 
-          ansible.RunPlayBook(instanceDNS, playbook)
+            else:
+                logger.debug("Get DeploymentPlan " + data["deployPlan"])
+                deployPlan = DeployPlan.objects.get(name=data["deployPlan"])
+                swarmCluster = SwarmCluster.objects.get(name=data["swarmCluster"])
+                swarmServers = Swarm.objects.filter(swarmCluster=swarmCluster)
 
-  except Exception as e:
-      return JsonResponse({"status": "Fail",
-                           "Message": e.message})
+                logger.info("Start Deploy DeploymentPlan " + data["deployPlan"] + " for project " + data["projectName"] +
+                            "on " + swarmCluster.name + " Swarm Cluster")
+
+                logger.debug("Create new row on database for deployment")
+                # deployment = Deployment.objects.create(projectName=data["projectName"],
+                #                                        deployPlan=deployPlan,
+                #                                        swarm=swarmCluster)
 
 
-# Create your views here.
-@method_decorator(csrf_exempt,name="dispatch")
-class Cluster(View):
-    def get(self,request,ClusterDNS):
-        cluster = Cluster.objects.filter(dns=ClusterDNS)
+                logger.debug("Compose Request")
+                dockerComposer = DockerComposer()
 
-        return JsonResponse({"status": "Success"})
+                params = data["params"]
+                params["projectName"] = data["projectName"]
+                params["OVERLAY_NETWORK"] = "Net_" + data["projectName"]
 
+                dockerComposer.CreateServiceCommand(deployPlan.compose,params)
+
+                # logger.debug("Compose file after render \n" + deployment.renderCompose)
+
+
+        except Exception as e:
+            return JsonResponse({"status": "Fail",
+                               "Message": e.message})
+    else:
+        return JsonResponse({"status": "Fail",
+                             "Message": "Send only with POST"})

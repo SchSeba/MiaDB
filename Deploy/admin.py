@@ -4,25 +4,25 @@ from models import *
 
 # Register your models here.
 class DeployPlanAdmin(admin.ModelAdmin):
-    list_display = ("name","vendor")
-    search_fields = ["name","vendor"]
-    list_filter = ["vendor"]
+    list_display = ("name","compose")
+    search_fields = ["name"]
 
-class DeploySequenceAdmin(admin.ModelAdmin):
-    list_display = ("deployPlan","sequence","instanceType")
-    list_filter = ["deployPlan","instanceType"]
+class SwarmAdmin(admin.ModelAdmin):
+    list_display = ("swarmCluster","name","ip","port")
+    search_fields = ["swarmCluster","name","ip"]
+    list_filter = ["swarmCluster"]
 
-class ClusterAdmin(admin.ModelAdmin):
-    list_display = ("dns","vendor","createDate")
-    search_fields = ["dns","vendor"]
-    list_filter = ["vendor"]
+class SwarmClusterAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ["name"]
 
-class NodeAdmin(admin.ModelAdmin):
-    list_display = ("dns","cluster")
-    search_fields = ["dns"]
-    list_filter = ["cluster"]
+class DeploymentAdmin(admin.ModelAdmin):
+    list_display = ("projectName","deployPlan","swarm","createDate")
+    search_fields = ["projectName","deployPlan"]
+    list_filter = ["deployPlan","swarm"]
 
 
 admin.site.register(DeployPlan,DeployPlanAdmin)
-admin.site.register(Cluster,ClusterAdmin)
-admin.site.register(Node,NodeAdmin)
+admin.site.register(Swarm,SwarmAdmin)
+admin.site.register(Deployment,DeploymentAdmin)
+admin.site.register(SwarmCluster,SwarmClusterAdmin)

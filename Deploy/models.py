@@ -1,34 +1,46 @@
 from __future__ import unicode_literals
 from django.db import models
-from DataBase.models import *
+# from DataBase.models import *
 
 
 # Create your models here.
+class SwarmCluster(models.Model):
+    name = models.CharField(max_length=120, db_index=True)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Swarm(models.Model):
+    swarmCluster = models.ForeignKey(SwarmCluster)
+    name = models.CharField(max_length=120, db_index=True)
+    ip = models.CharField(max_length=15,db_index=True)
+    port = models.IntegerField()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ('name', 'ip',)
+
+
 class DeployPlan(models.Model):
     name = models.CharField(max_length=120, unique=True)
-    vendor = models.ForeignKey(Vendor)
     compose = models.TextField()
 
     def __unicode__(self):
         return self.name
 
 
-class Cluster(models.Model):
-    dns = models.CharField(max_length=20)
-    project = models.CharField(max_length=120)
-    vendor = models.ForeignKey(Vendor)
+class Deployment(models.Model):
+    projectName = models.CharField(max_length=20,unique=True)
+    deployPlan = models.ForeignKey(DeployPlan)
+    swarm = models.ForeignKey(SwarmCluster)
     createDate = models.DateTimeField(auto_now=True)
+    renderCompose = models.TextField(blank=True,default="")
 
     def __unicode__(self):
-        return self.dns
+        return self.projectName
 
     class Meta:
-        unique_together = ("dns","project")
-
-class Node(models.Model):
-    dns = models.CharField(max_length=20, unique=True)
-    cluster = models.ForeignKey(Cluster)
-
-
-    def __unicode__(self):
-            return self.dns
+        unique_together=("projectName","deployPlan","swarm")
