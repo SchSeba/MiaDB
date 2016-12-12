@@ -32,12 +32,21 @@ class DockerComposer():
         for index in range(yamlData["services"].__len__()):
             service = yamlData["services"][index].keys()[0]
             serviceYaml = yamlData["services"][index][service]
+            mounts = []
 
-            cont = ContainerSpec(serviceYaml["image"],env=serviceYaml["env"],)
+            #For bind mounts
+            if serviceYaml.has_key("mount"):
+                for mountKeys in serviceYaml["mount"]["bind"].keys():
+                    serviceYaml["mount"]["bind"][mountKeys]["type"]="bind"
+                    mounts.append(serviceYaml["mount"]["bind"][mountKeys])
+
+            cont = ContainerSpec(serviceYaml["image"],env=serviceYaml["env"],mounts=mounts)
             task_tmpl = TaskTemplate(cont)
 
-            dockerServicesCommand.append(task_tmpl)
+            dockerServicesCommand.append({"name":serviceYaml["name"],
+                                          "service":task_tmpl})
 
+        return dockerServicesCommand
 
 
     def CreateServiceCommand(self,composeText,params):

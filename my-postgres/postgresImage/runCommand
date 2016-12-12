@@ -8,10 +8,10 @@ docker service create -e CLUSTER_NAME=pg_cluster \
                       -e REPLICATION_PRIMARY_PORT=5432 \
                       -e NODE_ID=1 \
                       -e NODE_NAME=node1 \
-                      -e POSTGRES_PASSWORD=monkey_pass \
                       -e POSTGRES_USER=monkey_user \
                       -e POSTGRES_DB=monkey_db \
                       -e INITIAL_NODE_TYPE=master \
+                      -e POSTGRES_PASSWORD=monkey_pass \
 					  -e CLUSTER_NODE_NETWORK_NAME=pgnode1 \
 					  --mount type=bind,src=/root/test/pgnode1/data,dst=/var/lib/postgresql/data \
 					  --mount type=bind,src=/root/test/master,dst=/master \

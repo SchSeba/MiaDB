@@ -33,7 +33,7 @@ class DeployPlan(models.Model):
 
 
 class Deployment(models.Model):
-    projectName = models.CharField(max_length=20,unique=True)
+    projectName = models.CharField(max_length=120,unique=True)
     deployPlan = models.ForeignKey(DeployPlan)
     swarm = models.ForeignKey(SwarmCluster)
     createDate = models.DateTimeField(auto_now=True)
@@ -44,3 +44,12 @@ class Deployment(models.Model):
 
     class Meta:
         unique_together=("projectName","deployPlan","swarm")
+
+
+class Service(models.Model):
+    deployment = models.ForeignKey(Deployment)
+    serviceID = models.CharField(max_length=15)
+    name = models.CharField(max_length=120)
+
+    def __unicode__(self):
+        return self.name

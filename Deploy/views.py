@@ -69,9 +69,16 @@ def Deploy(request):
                 params["projectName"] = data["projectName"]
                 params["OVERLAY_NETWORK"] = "Net_" + data["projectName"]
 
-                dockerComposer.CreateServiceCommand(deployPlan.compose,params)
-
+                dockerServicesCommand, yamlText = dockerComposer.CreateServiceCommand(deployPlan.compose,params)
                 # logger.debug("Compose file after render \n" + deployment.renderCompose)
+
+                swarmManagers = []
+                for manager in swarmServers:
+                    swarmManagers.append(manager.ip + ":" + manager.port)
+                dockerConnector = DockerConnector(swarmCluster)
+
+                for service in dockerServicesCommand:
+                    serviceID = dockerConnector.CreateService(service)
 
 
         except Exception as e:

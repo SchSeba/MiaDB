@@ -3,10 +3,21 @@ import logging
 
 class DockerConnector():
 
-    def __init__(self,dockerManagerIp,DockerManagerPort):
-        self.dockerManagerIp = dockerManagerIp
-        self.DockerManagerPort = DockerManagerPort
-        self.dockerClient = Client(base_url="tcp://"+dockerManagerIp+":"+DockerManagerPort)
+    def __init__(self,dockerManagerList):
+        isManagerAlive = False
+        for manager in dockerManagerList:
+            try:
+                self.dockerClient = Client(base_url="tcp://" + manager)
+                self.dockerClient.info()
+                isManagerAlive = True
+                break
+
+            except Exception as e:
+                pass
+
+        if not isManagerAlive:
+            raise Exception("Not manager server alive found")
+
 
 
     def CreateContainer(self,name,image,hostVolume,containerVolume,environmentVariable):
@@ -114,4 +125,11 @@ class DockerConnector():
             logging.ERROR("Fail to Run Container Exception Message: " + e.message)
             return {"status": "Fail",
                     "Message": e.message}
+
+
+    def CreateService(self,ServiceParam):
+
+        return self.dockerClient.create_service(ServiceParam["Service"], name=ServiceParam["name"])
+
+
 

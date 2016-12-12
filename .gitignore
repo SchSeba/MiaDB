@@ -1,4 +1,4 @@
-.idea
+/.idea
 *.py[co]
 *.sw[po]
 *.bak
