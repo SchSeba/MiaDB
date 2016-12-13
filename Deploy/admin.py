@@ -21,8 +21,13 @@ class DeploymentAdmin(admin.ModelAdmin):
     search_fields = ["projectName","deployPlan"]
     list_filter = ["deployPlan","swarm"]
 
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ("serviceID","name","deployment")
+    search_fields = ["name"]
+    list_filter = ["deployment"]
 
 admin.site.register(DeployPlan,DeployPlanAdmin)
 admin.site.register(Swarm,SwarmAdmin)
 admin.site.register(Deployment,DeploymentAdmin)
 admin.site.register(SwarmCluster,SwarmClusterAdmin)
+admin.site.register(Service,ServiceAdmin)

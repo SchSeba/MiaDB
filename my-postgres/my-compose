@@ -19,15 +19,15 @@ services:
      mount:
        bind:
         data:
-          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/"
+          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
         masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
         archive:
-          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive"
+          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
-     name: {{projectName}}_pgnode{{SERVICE_COUNT}}
+     name: {{projectName}}pgnode{{SERVICE_COUNT}}
 
 
   - pg-slave:
@@ -48,15 +48,15 @@ services:
      mount:
        bind:
         data:
-          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/"
+          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
         masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
         archive:
-          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive"
+          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
-     name: {{projectName}}_pgnode{{SERVICE_COUNT}}
+     name: {{projectName}}pgnode{{SERVICE_COUNT}}
 
   - pg-slave:
      image: my-postgres
@@ -76,15 +76,15 @@ services:
      mount:
        bind:
         data:
-          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/"
+          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
         masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
         archive:
-          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive"
+          source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
-     name: {{projectName}}_pgnode{{SERVICE_COUNT}}
+     name: {{projectName}}pgnode{{SERVICE_COUNT}}
 
   - pgpool:
      image: pgpool
@@ -101,7 +101,7 @@ services:
       - 5432:5432
       - 9898:9898
 
-     name: {{projectName}}_pgpool
+     name: {{projectName}}pgpool
 
 
 network: "{{OVERLAY_NETWORK}}"

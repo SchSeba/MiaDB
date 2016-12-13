@@ -9,6 +9,8 @@ from models import *
 import logging
 import json
 import yaml
+import os
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -56,30 +58,59 @@ def Deploy(request):
                 logger.info("Start Deploy DeploymentPlan " + data["deployPlan"] + " for project " + data["projectName"] +
                             "on " + swarmCluster.name + " Swarm Cluster")
 
-                logger.debug("Create new row on database for deployment")
-                # deployment = Deployment.objects.create(projectName=data["projectName"],
-                #                                        deployPlan=deployPlan,
-                #                                        swarm=swarmCluster)
-
-
                 logger.debug("Compose Request")
                 dockerComposer = DockerComposer()
 
                 params = data["params"]
                 params["projectName"] = data["projectName"]
-                params["OVERLAY_NETWORK"] = "Net_" + data["projectName"]
+                params["OVERLAY_NETWORK"] = "Net" + data["projectName"]
 
                 dockerServicesCommand, yamlText = dockerComposer.CreateServiceCommand(deployPlan.compose,params)
-                # logger.debug("Compose file after render \n" + deployment.renderCompose)
 
                 swarmManagers = []
                 for manager in swarmServers:
-                    swarmManagers.append(manager.ip + ":" + manager.port)
-                dockerConnector = DockerConnector(swarmCluster)
+                    swarmManagers.append(manager.ip + ":" + str(manager.port))
 
-                for service in dockerServicesCommand:
-                    serviceID = dockerConnector.CreateService(service)
+                dockerConnector = DockerConnector(swarmManagers)
 
+                logger.debug("Create new row on database for deployment")
+                deployment = Deployment.objects.create(projectName=data["projectName"],
+                                                       deployPlan=deployPlan,
+                                                       swarm=swarmCluster,
+                                                       renderCompose=yamlText)
+
+                logger.debug("Compose file after render \n" + deployment.renderCompose)
+
+                try:
+                    logger.info("Creating services")
+                    serviceIDs = []
+                    for service in dockerServicesCommand:
+
+                        logger.debug("Create Folder and file on docker host if not exist")
+                        for mount in service['service']["ContainerSpec"]["Mounts"]:
+                            #Check for file or directory
+                            if mount["source"][-1] == "/":
+                                if os.path.exists(mount["source"]):
+                                    shutil.rmtree(mount["source"])
+                                os.makedirs(mount["source"])
+                            else:
+                                open(mount["source"], "w").close()
+
+                        logger.debug("Create service name " + service["name"])
+                        serviceID = dockerConnector.CreateService(service)["ID"]
+                        serviceIDs.append(serviceID)
+                        logger.debug("Create successfully Service ID " + serviceID)
+                        Service.objects.create(deployment=deployment,
+                                               serviceID=serviceID,
+                                               name=service["name"])
+
+                    return JsonResponse({"status": "SUCCESS",
+                                         "Message": serviceIDs})
+
+                except Exception as e:
+                    deployment.delete()
+                    return JsonResponse({"status": "Fail",
+                                         "Message": e.message})
 
         except Exception as e:
             return JsonResponse({"status": "Fail",

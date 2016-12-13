@@ -52,6 +52,13 @@ def FirstCreation():
         RunCommand("rm -rf " + os.getenv("PGDATA") + "/*")
 
         print ("INITIAL_NODE_TYPE Env: " + os.getenv("INITIAL_NODE_TYPE"))
+
+        if RunCommand("cat /master") == '':
+            print ("Primary server not found")
+            raise ("Primary server not found")
+        else:
+            os.environ["REPLICATION_PRIMARY_HOST"] = RunCommand("cat /master")
+
         print ("REPLICATION_PRIMARY_HOST Env: " + os.getenv("REPLICATION_PRIMARY_HOST"))
         print ("Run Wait_DB, Waiting for Master to go up")
         RunCommand(

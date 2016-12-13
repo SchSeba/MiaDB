@@ -6,6 +6,6 @@ scp
 netmiko
 pymongo
 requests
-docker-py
+docker
 tornado
 pyyaml

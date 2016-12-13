@@ -1,4 +1,4 @@
-from docker import Client
+import docker
 import logging
 
 class DockerConnector():
@@ -7,7 +7,7 @@ class DockerConnector():
         isManagerAlive = False
         for manager in dockerManagerList:
             try:
-                self.dockerClient = Client(base_url="tcp://" + manager)
+                self.dockerClient = docker.DockerClient(base_url="tcp://" + manager)
                 self.dockerClient.info()
                 isManagerAlive = True
                 break
@@ -128,8 +128,8 @@ class DockerConnector():
 
 
     def CreateService(self,ServiceParam):
+        #Check if the network exist
+        if self.dockerClient.networks.list(names=[ServiceParam["network"]]).__len__() == 0:
+            self.dockerClient.networks.create(name=ServiceParam["network"],driver="overlay")
 
-        return self.dockerClient.create_service(ServiceParam["Service"], name=ServiceParam["name"])
-
-
-
+        return self.dockerClient.services.create(image=ServiceParam["service"]["image"],attrs=ServiceParam["service"])

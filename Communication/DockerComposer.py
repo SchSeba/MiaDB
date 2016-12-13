@@ -1,14 +1,13 @@
 from django.template import Template,Context
 from MiaDB.settings import BasePath
 import yaml
-from docker import Client
 from docker.types import TaskTemplate, ContainerSpec
 
 class DockerComposer():
     def Createyaml(self,composeText,params):
-        composeText.replace("{{OVERLAY_NETWORK}}",params["OVERLAY_NETWORK"])\
-                   .replace("{{BasePath}}",BasePath)\
-                   .replace("{{projectName}}",params["projectName"])
+        composeText = composeText.replace("{{OVERLAY_NETWORK}}",params["OVERLAY_NETWORK"])\
+                                 .replace("{{BasePath}}",BasePath)\
+                                 .replace("{{projectName}}",params["projectName"])
 
         yamlData = yaml.load(composeText)
 
@@ -36,15 +35,23 @@ class DockerComposer():
 
             #For bind mounts
             if serviceYaml.has_key("mount"):
-                for mountKeys in serviceYaml["mount"]["bind"].keys():
-                    serviceYaml["mount"]["bind"][mountKeys]["type"]="bind"
-                    mounts.append(serviceYaml["mount"]["bind"][mountKeys])
+                if serviceYaml["mount"].has_key("bind"):
+                    for mountKeys in serviceYaml["mount"]["bind"].keys():
+                        serviceYaml["mount"]["bind"][mountKeys]["type"]="bind"
+                        mounts.append(serviceYaml["mount"]["bind"][mountKeys])
+
+                elif serviceYaml["mount"].has_key("volume"):
+                    for mountKeys in serviceYaml["mount"]["volume"].keys():
+                        serviceYaml["mount"]["volume"][mountKeys]["type"]="volume"
+                        mounts.append(serviceYaml["mount"]["volume"][mountKeys])
+
 
             cont = ContainerSpec(serviceYaml["image"],env=serviceYaml["env"],mounts=mounts)
             task_tmpl = TaskTemplate(cont)
 
             dockerServicesCommand.append({"name":serviceYaml["name"],
-                                          "service":task_tmpl})
+                                          "service":task_tmpl,
+                                          "network":yamlData["network"]})
 
         return dockerServicesCommand
 
