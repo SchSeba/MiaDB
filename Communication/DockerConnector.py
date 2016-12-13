@@ -1,4 +1,5 @@
 import docker
+from docker.types import IPAMConfig
 import logging
 
 class DockerConnector():
@@ -130,6 +131,11 @@ class DockerConnector():
     def CreateService(self,ServiceParam):
         #Check if the network exist
         if self.dockerClient.networks.list(names=[ServiceParam["network"]]).__len__() == 0:
-            self.dockerClient.networks.create(name=ServiceParam["network"],driver="overlay")
+            ipam_config = docker.types.IPAMConfig()
+            self.dockerClient.networks.create(name=ServiceParam["network"],driver="overlay",ipam=ipam_config)
 
-        return self.dockerClient.services.create(image=ServiceParam["service"]["image"],attrs=ServiceParam["service"])
+        return self.dockerClient.services.create(image=ServiceParam["image"],
+                                                 mounts=ServiceParam["mounts"],
+                                                 env=ServiceParam["env"],
+                                                 name=ServiceParam["name"],
+                                                 networks=ServiceParam["networks"])

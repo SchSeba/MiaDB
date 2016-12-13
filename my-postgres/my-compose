@@ -21,12 +21,15 @@ services:
         data:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
+          type: "bind"
         masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
+          type: "bind"
         archive:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
+          type: "bind"
      name: {{projectName}}pgnode{{SERVICE_COUNT}}
 
 
@@ -50,12 +53,15 @@ services:
         data:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
+          type: "bind"
         masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
+          type: "bind"
         archive:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
+          type: "bind"
      name: {{projectName}}pgnode{{SERVICE_COUNT}}
 
   - pg-slave:
@@ -78,12 +84,15 @@ services:
         data:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
+          type: "bind"
         masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
+          type: "bind"
         archive:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
+          type: "bind"
      name: {{projectName}}pgnode{{SERVICE_COUNT}}
 
   - pgpool:
