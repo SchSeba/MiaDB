@@ -1,3 +1,4 @@
+from django.core import serializers
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Communication.DockerConnector import *
@@ -12,13 +13,27 @@ import shutil
 logger = logging.getLogger("MiaDB")
 
 def GetDeployPlans(request):
-    return JsonResponse({"status": "Success"})
+    return JsonResponse(list(DeployPlan.objects.values("pk","name").all()),safe=False)
+
+def GetDeployPlanByName(request,DeployPlanName):
+    return JsonResponse(list(DeployPlan.objects.values().filter(name=DeployPlanName)),safe=False)
 
 
-def GetDeployPlan(request,DeploymentName):
-    deployPlan = DeployPlan.objects.get(name=DeploymentName)
+def GetDeployments(request):
+    return JsonResponse(list(Deployment.objects.all().values("id",
+                                                             "projectName",
+                                                             "createDate",
+                                                             "deployPlan__name")),safe=False)
 
-    return JsonResponse({"status": "Success"})
+
+def GetDeploymentByName(request,DeploymentByName):
+    return JsonResponse(list(Deployment.objects.values("id",
+                                                       "projectName",
+                                                       "createDate",
+                                                       "deployPlan__name",
+                                                       "service__name",
+                                                       "service__serviceID").filter(projectName=DeploymentByName)), safe=False)
+    #TODO: need to work here add this line list(Service.objects.values().filter("")
 
 
 """

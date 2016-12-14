@@ -1,9 +1,7 @@
 from django.template import Template,Context
-
-
 from MiaDB.settings import BasePath
 import yaml
-from docker.types import TaskTemplate, ContainerSpec
+
 
 class DockerComposer():
     def Createyaml(self,composeText,params):
@@ -53,15 +51,7 @@ class DockerComposer():
                     publishDict[int(publish.split(":")[0])] = int(publish.split(":")[1])
                 serviceYaml["publish"] = publishDict
 
-            # mounts = []
-            #
-            # #For bind mounts
-            # if serviceYaml.has_key("mount"):
-            #     for mountKeys in serviceYaml["mount"]:
-            #         mounts.append(mountKeys)
 
-
-            # serviceYaml["mounts"] = mounts
             dockerServicesCommand.append(serviceYaml)
 
         return dockerServicesCommand
@@ -72,6 +62,5 @@ class DockerComposer():
 
         #Create services command
         dockerServicesCommand = self.GetDockerServicesCommand(yamlText)
-
 
         return dockerServicesCommand, yamlText

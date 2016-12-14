@@ -19,6 +19,8 @@ from views import *
 urlpatterns = [
     # url(r'GetClusterInfo/(?P<ClusterDNS>\w+)/$',Cluster.as_view(),name="GetClusterInfo"),
     url(r'GetDeployPlans/$',GetDeployPlans,name="GetDeployPlans"),
-    url(r'GetDeployPlan/(?P<DeploymentName>\w+)/$', GetDeployPlan, name="GetDeployPlan"),
+    url(r'GetDeployments/$',GetDeployments,name="GetDeployments"),
+    url(r'GetDeployPlanByName/(?P<DeployPlanName>\w+)/$', GetDeployPlanByName, name="GetDeployPlan"),
+    url(r'GetDeploymentByName/(?P<DeploymentByName>\w+)/$', GetDeploymentByName, name="GetDeploymentByName"),
     url(r'Deploy/$',Deploy,name="Deploy")
 ]
