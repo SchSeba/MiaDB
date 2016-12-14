@@ -1,6 +1,4 @@
-from django.shortcuts import render
-from django.template import Template, Context
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Communication.DockerConnector import *
 from Communication.DockerComposer import *
@@ -8,11 +6,10 @@ from models import *
 
 import logging
 import json
-import yaml
 import os
 import shutil
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("MiaDB")
 
 def GetDeployPlans(request):
     return JsonResponse({"status": "Success"})
@@ -87,7 +84,7 @@ def Deploy(request):
                     for service in dockerServicesCommand:
 
                         logger.debug("Create Folder and file on docker host if not exist")
-                        for mount in service['service']["ContainerSpec"]["Mounts"]:
+                        for mount in service["mounts"]:
                             #Check for file or directory
                             if mount["source"][-1] == "/":
                                 if os.path.exists(mount["source"]):
@@ -97,22 +94,24 @@ def Deploy(request):
                                 open(mount["source"], "w").close()
 
                         logger.debug("Create service name " + service["name"])
-                        serviceID = dockerConnector.CreateService(service)["ID"]
-                        serviceIDs.append(serviceID)
-                        logger.debug("Create successfully Service ID " + serviceID)
+                        service = dockerConnector.CreateService(service)
+                        serviceIDs.append(service.id)
+                        logger.debug("Create successfully Service ID " + service.id)
                         Service.objects.create(deployment=deployment,
-                                               serviceID=serviceID,
-                                               name=service["name"])
+                                               serviceID=service.id,
+                                               name=service.name)
 
                     return JsonResponse({"status": "SUCCESS",
                                          "Message": serviceIDs})
 
                 except Exception as e:
                     deployment.delete()
+                    logger.error(str(e.message))
                     return JsonResponse({"status": "Fail",
-                                         "Message": e.message})
+                                         "Message": str(e.message)})
 
         except Exception as e:
+            logger.error(e.message)
             return JsonResponse({"status": "Fail",
                                "Message": e.message})
     else:

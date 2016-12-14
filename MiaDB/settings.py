@@ -154,7 +154,7 @@ BasePath = "/root"
 if not os.environ.has_key("windir"):
     LOGGING = {
         'version': 1,
-        'disable_existing_loggers': True,
+        'disable_existing_loggers': False,
         'filters': {
             'require_debug_false': {
                 '()': 'django.utils.log.RequireDebugFalse',
@@ -203,16 +203,17 @@ if not os.environ.has_key("windir"):
         },
         'loggers': {
             'MiaDB': {
-                'handlers': ['console','development_logfile','production_logfile'],
+                'handlers': ['development_logfile',],
+                'level': 'DEBUG',
              },
-            'dba': {
-                'handlers': ['console','dba_logfile'],
-            },
-            'django': {
-                'handlers': ['console','development_logfile','production_logfile'],
-            },
-            'py.warnings': {
-                'handlers': ['console','development_logfile'],
-            },
+            # 'dba': {
+            #     'handlers': ['console','dba_logfile'],
+            # },
+            # 'django': {
+            #     'handlers': ['console','development_logfile','production_logfile'],
+            # },
+            # 'py.warnings': {
+            #     'handlers': ['console','development_logfile'],
+            # },
         }
     }

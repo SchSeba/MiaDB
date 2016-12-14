@@ -1,4 +1,6 @@
 from django.template import Template,Context
+
+
 from MiaDB.settings import BasePath
 import yaml
 from docker.types import TaskTemplate, ContainerSpec
@@ -31,18 +33,35 @@ class DockerComposer():
         for index in range(yamlData["services"].__len__()):
             service = yamlData["services"][index].keys()[0]
             serviceYaml = yamlData["services"][index][service]
-            serviceYaml["networks"] = [yamlData["network"]]
-            mounts = []
 
-            #For bind mounts
-            if serviceYaml.has_key("mount"):
-                for mountKeys in serviceYaml["mount"]["bind"].keys():
-                    mounts.append(serviceYaml["mount"]["bind"][mountKeys])
+            if yamlData.has_key("network"):
+                serviceYaml["networks"] = [yamlData["network"]]
+            else:
+                serviceYaml["networks"] = []
 
-                for mountKeys in serviceYaml["mount"]["volume"].keys():
-                    mounts.append(serviceYaml["mount"]["volume"][mountKeys])
+            if not serviceYaml.has_key("mounts"):
+                serviceYaml["mounts"] = []
 
-            serviceYaml["mounts"] = mounts
+            if not serviceYaml.has_key("env"):
+                serviceYaml["env"] = []
+
+            if not serviceYaml.has_key("publish"):
+                serviceYaml["publish"] = {}
+            else:
+                publishDict = {}
+                for publish in serviceYaml["publish"]:
+                    publishDict[int(publish.split(":")[0])] = int(publish.split(":")[1])
+                serviceYaml["publish"] = publishDict
+
+            # mounts = []
+            #
+            # #For bind mounts
+            # if serviceYaml.has_key("mount"):
+            #     for mountKeys in serviceYaml["mount"]:
+            #         mounts.append(mountKeys)
+
+
+            # serviceYaml["mounts"] = mounts
             dockerServicesCommand.append(serviceYaml)
 
         return dockerServicesCommand

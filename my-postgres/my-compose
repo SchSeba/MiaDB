@@ -10,23 +10,22 @@ services:
        - REPLICATION_PASSWORD=replication_pass
        - REPLICATION_PRIMARY_PORT=5432
        - NODE_ID={{SERVICE_COUNT}}
-       - NODE_NAME=node{{SERVICE_COUNT}}
+       - NODE_NAME={{projectName}}node{{SERVICE_COUNT}}
        - POSTGRES_PASSWORD={{POSTGRES_PASSWORD}}
        - POSTGRES_USER={{POSTGRES_USER}}
        - POSTGRES_DB={{POSTGRES_DB}}
        - INITIAL_NODE_TYPE=master
-       - CLUSTER_NODE_NETWORK_NAME=pgnode{{SERVICE_COUNT}}
-     mount:
-       bind:
-        data:
+       - CLUSTER_NODE_NETWORK_NAME={{projectName}}pgnode{{SERVICE_COUNT}}
+     mounts:
+        - data:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
           type: "bind"
-        masterFile:
+        - masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
           type: "bind"
-        archive:
+        - archive:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
           type: "bind"
@@ -42,23 +41,22 @@ services:
        - REPLICATION_PASSWORD=replication_pass
        - REPLICATION_PRIMARY_PORT=5432
        - NODE_ID={{SERVICE_COUNT}}
-       - NODE_NAME=node{{SERVICE_COUNT}}
+       - NODE_NAME={{projectName}}node{{SERVICE_COUNT}}
        - POSTGRES_PASSWORD={{POSTGRES_PASSWORD}}
        - POSTGRES_USER={{POSTGRES_USER}}
        - POSTGRES_DB={{POSTGRES_DB}}
        - INITIAL_NODE_TYPE=standby
-       - CLUSTER_NODE_NETWORK_NAME=pgnode{{SERVICE_COUNT}}
-     mount:
-       bind:
-        data:
+       - CLUSTER_NODE_NETWORK_NAME={{projectName}}pgnode{{SERVICE_COUNT}}
+     mounts:
+        - data:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
           type: "bind"
-        masterFile:
+        - masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
           type: "bind"
-        archive:
+        - archive:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
           type: "bind"
@@ -73,23 +71,22 @@ services:
        - REPLICATION_PASSWORD=replication_pass
        - REPLICATION_PRIMARY_PORT=5432
        - NODE_ID={{SERVICE_COUNT}}
-       - NODE_NAME=node{{SERVICE_COUNT}}
+       - NODE_NAME={{projectName}}node{{SERVICE_COUNT}}
        - POSTGRES_PASSWORD={{POSTGRES_PASSWORD}}
        - POSTGRES_USER={{POSTGRES_USER}}
        - POSTGRES_DB={{POSTGRES_DB}}
        - INITIAL_NODE_TYPE=standby
-       - CLUSTER_NODE_NETWORK_NAME=pgnode{{SERVICE_COUNT}}
-     mount:
-       bind:
-        data:
+       - CLUSTER_NODE_NETWORK_NAME={{projectName}}pgnode{{SERVICE_COUNT}}
+     mounts:
+        - data:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/data/"
           target: "/var/lib/postgresql/data"
           type: "bind"
-        masterFile:
+        - masterFile:
           source: "{{BasePath}}/{{projectName}}/master"
           target: "/master"
           type: "bind"
-        archive:
+        - archive:
           source: "{{BasePath}}/{{projectName}}/pgnode{{SERVICE_COUNT}}/archive/"
           target: "/var/lib/postgresql/archive"
           type: "bind"
@@ -103,8 +100,8 @@ services:
       - REPLICATION_USER=replication_user
       - REPLICATION_PASSWORD=replication_pass
       - DB_USERS={{POSTGRES_USER}}:{{POSTGRES_PASSWORD}}
-      - BACKENDS="0:pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:pgnode2:5432:2:::ALLOW_TO_FAILOVER,"
-      - CONFIGS="num_init_children:250,max_pool:4,search_primary_node_timeout:5"
+      - BACKENDS=0:{{projectName}}pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:{{projectName}}pgnode2:5432:2:::ALLOW_TO_FAILOVER,
+      - CONFIGS=num_init_children:250,max_pool:3,search_primary_node_timeout:5
 
      publish:
       - 5432:5432
