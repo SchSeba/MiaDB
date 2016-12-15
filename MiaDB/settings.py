@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 'DataBase',
     'Deploy',
 ]
 
@@ -138,14 +137,6 @@ STATIC_URL = '/static/'
 
 # MiaDB CommunicationClass
 
-# from Communication.OpenStackConnector import *
-# from Communication.AnsibleConnector import *
-
-
-# OpenStackManagerIp = os.getenv("OpenStackManagerIp","127.0.0.1")
-# OpenStackManagerPort = os.getenv("OpenStackManagerPort","443")
-# openStack = OpenStackConnector(OpenStackManagerIp,OpenStackManagerPort)
-# ansible = AnsibleConnector()
 
 
 # Global Config

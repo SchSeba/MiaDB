@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from Communication.DockerConnector import *
 from Communication.DockerComposer import *
 from models import *
+from Scale.ScaleManager import *
 
 import logging
 import json
@@ -12,8 +13,10 @@ import shutil
 
 logger = logging.getLogger("MiaDB")
 
+
 def GetDeployPlans(request):
     return JsonResponse(list(DeployPlan.objects.values("pk","name").all()),safe=False)
+
 
 def GetDeployPlanByName(request,DeployPlanName):
     return JsonResponse(list(DeployPlan.objects.values().filter(name=DeployPlanName)),safe=False)
@@ -27,13 +30,15 @@ def GetDeployments(request):
 
 
 def GetDeploymentByName(request,DeploymentByName):
-    return JsonResponse(list(Deployment.objects.values("id",
-                                                       "projectName",
-                                                       "createDate",
-                                                       "deployPlan__name",
-                                                       "service__name",
-                                                       "service__serviceID").filter(projectName=DeploymentByName)), safe=False)
-    #TODO: need to work here add this line list(Service.objects.values().filter("")
+    deployment = Deployment.objects.filter(projectName=DeploymentByName)[0]
+
+    services = Service.objects.values("name", "serviceID").filter(deployment=deployment)
+    deployment = Deployment.objects.values("id",
+                                           "projectName",
+                                           "createDate",
+                                           "deployPlan__name").filter(projectName=DeploymentByName)[0]
+    deployment["services"] = list(services)
+    return JsonResponse(deployment, safe=False)
 
 
 """
@@ -129,6 +134,47 @@ def Deploy(request):
             logger.error(e.message)
             return JsonResponse({"status": "Fail",
                                "Message": e.message})
+    else:
+        return JsonResponse({"status": "Fail",
+                             "Message": "Send only with POST"})
+
+"""
+projectName: Dns for the Cluster
+deployPlan: Name For the Deployment Plan
+swarmCluster: name of swarm cluster
+params: directory of parameters
+"""
+def RemoveDeployment(request):
+    pass
+
+"""
+projectName: Dns for the Cluster
+deployPlan: Name For the Deployment Plan
+swarmCluster: name of swarm cluster
+params: directory of parameters
+"""
+@csrf_exempt
+def ScaleUP(request):
+    if request.method == "POST":
+        try:
+            logger.info("Load json data")
+            data = json.loads(request.body)
+            logger.debug(data)
+
+            deploment = Deployment.objects.filter(projectName=data["projectName"],
+                                         swarm=SwarmCluster.objects.get(name=data["swarmCluster"]),
+                                         deployPlan=DeployPlan.objects.get(name=data["deployPlan"]))
+
+            if deploment.__len__() == 0:
+                raise Exception("Project Doesnt exist")
+            else:
+                scaleManager = ScaleManager(deploment[0])
+                scaleManager.ScaleUp()
+
+        except Exception as e:
+            logger.error(e.message)
+            return JsonResponse({"status": "Fail",
+                                 "Message": e.message})
     else:
         return JsonResponse({"status": "Fail",
                              "Message": "Send only with POST"})

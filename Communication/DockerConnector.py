@@ -33,6 +33,9 @@ class DockerConnector():
                                                       env=ServiceParam["env"],
                                                       name=ServiceParam["name"],
                                                       networks=ServiceParam["networks"],
+                                                    mode={"Replicated": {
+                                                          "Replicas": 1
+                                                        }},
                                                       endpoint_spec=EndpointSpec(ports=ServiceParam["publish"]))
 
         return service

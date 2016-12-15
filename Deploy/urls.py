@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'GetDeployments/$',GetDeployments,name="GetDeployments"),
     url(r'GetDeployPlanByName/(?P<DeployPlanName>\w+)/$', GetDeployPlanByName, name="GetDeployPlan"),
     url(r'GetDeploymentByName/(?P<DeploymentByName>\w+)/$', GetDeploymentByName, name="GetDeploymentByName"),
-    url(r'Deploy/$',Deploy,name="Deploy")
+    url(r'Deploy/$',Deploy,name="Deploy"),
+    url(r'ScaleUP/$',ScaleUP,name="ScaleUP")
 ]

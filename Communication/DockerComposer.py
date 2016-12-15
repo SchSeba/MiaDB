@@ -19,8 +19,7 @@ class DockerComposer():
             serviceYaml = serviceYaml.replace("{{SERVICE_COUNT}}",str(index + 1))
 
             serviceYaml = Template(serviceYaml)
-            yamlData["services"][index][service]  = yaml.load(serviceYaml.render(context))
-
+            yamlData["services"][index][service] = yaml.load(serviceYaml.render(context))
 
         return yaml.dump(yamlData)
 
@@ -51,7 +50,6 @@ class DockerComposer():
                     publishDict[int(publish.split(":")[0])] = int(publish.split(":")[1])
                 serviceYaml["publish"] = publishDict
 
-
             dockerServicesCommand.append(serviceYaml)
 
         return dockerServicesCommand
@@ -60,7 +58,7 @@ class DockerComposer():
     def CreateServiceCommand(self,composeText,params):
         yamlText = self.Createyaml(composeText,params)
 
-        #Create services command
+        # Create services command
         dockerServicesCommand = self.GetDockerServicesCommand(yamlText)
 
         return dockerServicesCommand, yamlText
