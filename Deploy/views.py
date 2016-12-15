@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Communication.DockerConnector import *
 from Communication.DockerComposer import *
+from Communication.DockerService import *
 from models import *
 from Scale.ScaleManager import *
 
@@ -144,8 +145,38 @@ deployPlan: Name For the Deployment Plan
 swarmCluster: name of swarm cluster
 params: directory of parameters
 """
+@csrf_exempt
 def RemoveDeployment(request):
-    pass
+    if request.method == "POST":
+        try:
+            logger.info("Load json data")
+            data = json.loads(request.body)
+            logger.debug(data)
+
+            deployment = Deployment.objects.filter(projectName=data["projectName"],
+                                                  swarm=SwarmCluster.objects.get(name=data["swarmCluster"]),
+                                                  deployPlan=DeployPlan.objects.get(name=data["deployPlan"]))
+
+            if deployment.__len__() != 1:
+                raise Exception("Project Doesnt exist")
+            else:
+                deployment = deployment[0]
+                deploymentName = deployment.projectName
+                dockerService = DockerService(deployment)
+                dockerService.RemoveServices()
+
+                deployment.delete()
+
+            return JsonResponse({"status": "SUCCESS",
+                                 "Message": "Success Remove " + deploymentName + " Deployment"})
+
+        except Exception as e:
+            logger.error(e.message)
+            return JsonResponse({"status": "Fail",
+                                 "Message": e.message})
+    else:
+        return JsonResponse({"status": "Fail",
+                             "Message": "Send only with POST"})
 
 """
 projectName: Dns for the Cluster
@@ -161,14 +192,14 @@ def ScaleUP(request):
             data = json.loads(request.body)
             logger.debug(data)
 
-            deploment = Deployment.objects.filter(projectName=data["projectName"],
+            deployment = Deployment.objects.filter(projectName=data["projectName"],
                                          swarm=SwarmCluster.objects.get(name=data["swarmCluster"]),
                                          deployPlan=DeployPlan.objects.get(name=data["deployPlan"]))
 
-            if deploment.__len__() == 0:
+            if deployment.__len__() == 0:
                 raise Exception("Project Doesnt exist")
             else:
-                scaleManager = ScaleManager(deploment[0])
+                scaleManager = ScaleManager(deployment[0])
                 scaleManager.ScaleUp()
 
         except Exception as e:

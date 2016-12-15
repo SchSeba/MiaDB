@@ -33,12 +33,15 @@ class DockerConnector():
                                                       env=ServiceParam["env"],
                                                       name=ServiceParam["name"],
                                                       networks=ServiceParam["networks"],
-                                                    mode={"Replicated": {
-                                                          "Replicas": 1
-                                                        }},
+                                                      mode=ServiceParam["mode"],
                                                       endpoint_spec=EndpointSpec(ports=ServiceParam["publish"]))
 
         return service
+
+    def RemoveService(self,ServiceId):
+        service = self.dockerClient.services.get(ServiceId)
+
+        service.remove()
 
     # def CreateContainer(self,name,image,hostVolume,containerVolume,environmentVariable):
     #     try:

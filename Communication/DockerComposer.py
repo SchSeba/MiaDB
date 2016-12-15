@@ -42,6 +42,9 @@ class DockerComposer():
             if not serviceYaml.has_key("env"):
                 serviceYaml["env"] = []
 
+            if not serviceYaml.has_key("mode"):
+                serviceYaml["mode"] = None
+
             if not serviceYaml.has_key("publish"):
                 serviceYaml["publish"] = {}
             else:

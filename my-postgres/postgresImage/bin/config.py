@@ -42,7 +42,11 @@ def FirstCreation():
     if os.getenv("INITIAL_NODE_TYPE") == "master":
 
             print ("Start Master INITIAL First Time")
-            RunCommand("echo " + os.getenv("CLUSTER_NODE_NETWORK_NAME") + "> /master")
+
+            while RunCommand("cat /master") != os.getenv("CLUSTER_NODE_NETWORK_NAME"):
+                print("Write hostname to master file")
+                RunCommand("echo \"" + os.getenv("CLUSTER_NODE_NETWORK_NAME") + "\"> /master")
+
             RunCommand("cp -f /usr/local/bin/cluster/primary.entrypoint.sh /docker-entrypoint-initdb.d/")
             RunCommand("/docker-entrypoint.sh \"postgres\"")
             p = subprocess.Popen("exec gosu postgres \"postgres\"", stdout=subprocess.PIPE, shell=True)
@@ -55,7 +59,7 @@ def FirstCreation():
 
         if RunCommand("cat /master") == '':
             print ("Primary server not found")
-            raise ("Primary server not found")
+            raise Exception("Primary server not found")
         else:
             os.environ["REPLICATION_PRIMARY_HOST"] = RunCommand("cat /master")
 

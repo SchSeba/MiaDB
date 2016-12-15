@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django import forms
 
 from Communication.DockerComposer import DockerComposer
+from Communication.DockerService import DockerService
 from models import *
 
 class DeployPlanForm(forms.ModelForm):
@@ -39,11 +40,20 @@ class DeploymentAdmin(admin.ModelAdmin):
     list_display = ("projectName","deployPlan","swarm","createDate")
     search_fields = ["projectName","deployPlan"]
     list_filter = ["deployPlan","swarm"]
+    actions = ["delete_selected"]
 
     def delete_model(self, request, obj):
-        #TODO: Stop and remove the services
+        dockerService = DockerService(obj)
+        dockerService.RemoveServices()
 
         super(DeploymentAdmin, self).delete_model(request, obj)
+
+    def delete_selected(self, request, queryset):
+        for deployment in queryset:
+            dockerService = DockerService(deployment)
+            dockerService.RemoveServices()
+            deployment.delete()
+
 
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ("serviceID","name","deployment")

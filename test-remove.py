@@ -8,6 +8,6 @@ data = {"projectName":"test",
                   "POSTGRES_PASSWORD":"testpass",
                   "POSTGRES_DB": "testdb",
                   }}
-r = requests.post("http://127.0.0.1:8000/Deploy/",data=json.dumps(data))
+r = requests.post("http://127.0.0.1:8000/RemoveDeployment/",data=json.dumps(data))
 print (r.text)
 
