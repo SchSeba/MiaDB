@@ -197,14 +197,14 @@ if not os.environ.has_key("windir"):
                 'handlers': ['development_logfile',],
                 'level': 'DEBUG',
              },
-            # 'dba': {
-            #     'handlers': ['console','dba_logfile'],
-            # },
-            # 'django': {
-            #     'handlers': ['console','development_logfile','production_logfile'],
-            # },
-            # 'py.warnings': {
-            #     'handlers': ['console','development_logfile'],
-            # },
+            'dba': {
+                'handlers': ['console','development_logfile'],
+            },
+            'django': {
+                'handlers': ['console','development_logfile','production_logfile'],
+            },
+            'py.warnings': {
+                'handlers': ['console','development_logfile'],
+            },
         }
     }

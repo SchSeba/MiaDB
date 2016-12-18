@@ -15,7 +15,8 @@ class DeployPlanForm(forms.ModelForm):
         dockerComposer = DockerComposer()
 
         try:
-            dockerComposer.CreateServiceCommand(self.cleaned_data.get("compose"), {"params": {}})
+            dockerComposer.CreateServiceCommand(self.cleaned_data.get("compose"), {"params": {},
+                                                                                   "projectName":"test"})
         except Exception as e:
             raise ValidationError("Error Validating the compose text\n Error: " + e.message)
 

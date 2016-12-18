@@ -75,6 +75,7 @@ def Deploy(request):
                 logger.debug("Compose Request")
                 dockerComposer = DockerComposer()
 
+
                 dockerServicesCommand, yamlText = dockerComposer.CreateServiceCommand(deployPlan.compose,data)
 
                 logger.debug("Create new row on database for deployment")

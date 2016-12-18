@@ -2,7 +2,7 @@ import requests
 import json
 
 data = {"projectName":"test",
-        "deployPlan":"postgres",
+        "deployPlan":"postgres publish pgpool",
         "swarmCluster":"test-cluster",
         "params":{"POSTGRES_USER":"testuser",
                   "POSTGRES_PASSWORD":"testpass",

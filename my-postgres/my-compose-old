@@ -100,12 +100,8 @@ services:
       - REPLICATION_USER=replication_user
       - REPLICATION_PASSWORD=replication_pass
       - DB_USERS={{POSTGRES_USER}}:{{POSTGRES_PASSWORD}}
-      - BACKENDS={% for service in SERVICES_BEFORE_COUNT %} {{forloop.counter0}}:{{projectName}}pgnode{{forloop.counter}}:5432:{{forloop.counter}}:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,{%endfor%}
+      - BACKENDS=0:{{projectName}}pgnode1:5432:1:/var/lib/postgresql/data:ALLOW_TO_FAILOVER,1:{{projectName}}pgnode2:5432:2:::ALLOW_TO_FAILOVER,2:{{projectName}}pgnode2:5432:3:::ALLOW_TO_FAILOVER,
       - CONFIGS=num_init_children:250,max_pool:3,search_primary_node_timeout:5
-
-     publish:
-      - 5432:5432
-      - 9898:9898
 
      mode:
       Replicated:
