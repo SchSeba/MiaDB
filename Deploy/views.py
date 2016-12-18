@@ -1,4 +1,3 @@
-from django.core import serializers
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Communication.DockerConnector import *
@@ -9,8 +8,6 @@ from Scale.ScaleManager import *
 
 import logging
 import json
-import os
-import shutil
 
 logger = logging.getLogger("MiaDB")
 
@@ -71,7 +68,6 @@ def Deploy(request):
                 logger.debug("Get DeploymentPlan " + data["deployPlan"])
                 deployPlan = DeployPlan.objects.get(name=data["deployPlan"])
                 swarmCluster = SwarmCluster.objects.get(name=data["swarmCluster"])
-                swarmServers = Swarm.objects.filter(swarmCluster=swarmCluster)
 
                 logger.info("Start Deploy DeploymentPlan " + data["deployPlan"] + " for project " + data["projectName"] +
                             "on " + swarmCluster.name + " Swarm Cluster")
@@ -85,12 +81,6 @@ def Deploy(request):
 
                 dockerServicesCommand, yamlText = dockerComposer.CreateServiceCommand(deployPlan.compose,params)
 
-                swarmManagers = []
-                for manager in swarmServers:
-                    swarmManagers.append(manager.ip + ":" + str(manager.port))
-
-                dockerConnector = DockerConnector(swarmManagers)
-
                 logger.debug("Create new row on database for deployment")
                 deployment = Deployment.objects.create(projectName=data["projectName"],
                                                        deployPlan=deployPlan,
@@ -100,27 +90,8 @@ def Deploy(request):
                 logger.debug("Compose file after render \n" + deployment.renderCompose)
 
                 try:
-                    logger.info("Creating services")
-                    serviceIDs = []
-                    for service in dockerServicesCommand:
-
-                        logger.debug("Create Folder and file on docker host if not exist")
-                        for mount in service["mounts"]:
-                            #Check for file or directory
-                            if mount["source"][-1] == "/":
-                                if os.path.exists(mount["source"]):
-                                    shutil.rmtree(mount["source"])
-                                os.makedirs(mount["source"])
-                            else:
-                                open(mount["source"], "w").close()
-
-                        logger.debug("Create service name " + service["name"])
-                        service = dockerConnector.CreateService(service)
-                        serviceIDs.append(service.id)
-                        logger.debug("Create successfully Service ID " + service.id)
-                        Service.objects.create(deployment=deployment,
-                                               serviceID=service.id,
-                                               name=service.name)
+                    dockerService = DockerService(deployment)
+                    serviceIDs = dockerService.CreateService(dockerServicesCommand)
 
                     return JsonResponse({"status": "SUCCESS",
                                          "Message": serviceIDs})
@@ -184,6 +155,7 @@ deployPlan: Name For the Deployment Plan
 swarmCluster: name of swarm cluster
 params: directory of parameters
 """
+#TODO: Not finnish
 @csrf_exempt
 def ScaleUP(request):
     if request.method == "POST":

@@ -38,10 +38,11 @@ class DockerConnector():
 
         return service
 
-    def RemoveService(self,ServiceId):
-        service = self.dockerClient.services.get(ServiceId)
+    def RemoveService(self,serviceId):
+        if self.dockerClient.services.list(filters={'id': serviceId}).__len__() == 1:
+            service = self.dockerClient.services.get(serviceId)
 
-        service.remove()
+            service.remove()
 
     # def CreateContainer(self,name,image,hostVolume,containerVolume,environmentVariable):
     #     try:
