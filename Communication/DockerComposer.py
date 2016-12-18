@@ -11,6 +11,7 @@ class DockerComposer():
 
         yamlData = yaml.load(composeText)
 
+        params["SERVICES_COUNT"] = yamlData["services"].__len__()
         context = Context(params)
 
         for index in range(yamlData["services"].__len__()):
@@ -58,7 +59,12 @@ class DockerComposer():
         return dockerServicesCommand
 
 
-    def CreateServiceCommand(self,composeText,params):
+    def CreateServiceCommand(self,composeText,data):
+
+        params = data["params"]
+        params["projectName"] = data["projectName"]
+        params["OVERLAY_NETWORK"] = "Net" + data["projectName"]
+
         yamlText = self.Createyaml(composeText,params)
 
         # Create services command

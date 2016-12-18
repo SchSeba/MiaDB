@@ -75,11 +75,7 @@ def Deploy(request):
                 logger.debug("Compose Request")
                 dockerComposer = DockerComposer()
 
-                params = data["params"]
-                params["projectName"] = data["projectName"]
-                params["OVERLAY_NETWORK"] = "Net" + data["projectName"]
-
-                dockerServicesCommand, yamlText = dockerComposer.CreateServiceCommand(deployPlan.compose,params)
+                dockerServicesCommand, yamlText = dockerComposer.CreateServiceCommand(deployPlan.compose,data)
 
                 logger.debug("Create new row on database for deployment")
                 deployment = Deployment.objects.create(projectName=data["projectName"],
