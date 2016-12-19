@@ -11,10 +11,11 @@ class DockerComposer():
 
         yamlData = yaml.load(composeText)
 
-        params["SERVICES_COUNT"] = yamlData["services"].__len__()
+        params["SERVICES_COUNT"] = range(yamlData["services"].__len__())
         context = Context(params)
 
         for index in range(yamlData["services"].__len__()):
+            params["SERVICES_BEFORE_COUNT"] = range(index)
             service = yamlData["services"][index].keys()[0]
             serviceYaml = yaml.dump(yamlData["services"][index][service])
             serviceYaml = serviceYaml.replace("{{SERVICE_COUNT}}",str(index + 1))

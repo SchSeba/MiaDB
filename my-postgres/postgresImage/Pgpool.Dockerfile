@@ -1,9 +1,9 @@
 FROM debian:jessie
 ENV DOCKERIZE_VERSION v0.2.0
+  
+RUN echo deb http://debian.xtdv.net/debian jessie main > /etc/apt/sources.list && echo deb http://debian.xtdv.net/debian sid main >> /etc/apt/sources.list && apt-get update
 
-RUN echo deb http://debian.xtdv.net/debian jessie main > /etc/apt/sources.list && apt-get update
-
-RUN apt-get install -y libffi-dev libssl-dev pgpool2 wget postgresql-client
+RUN apt-get install -y libffi-dev libssl-dev pgpool2 wget
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
