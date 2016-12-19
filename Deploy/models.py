@@ -33,7 +33,7 @@ class DeployPlan(models.Model):
 
 
 class Deployment(models.Model):
-    projectName = models.CharField(max_length=120,unique=True)
+    projectName = models.CharField(max_length=120)
     deployPlan = models.ForeignKey(DeployPlan)
     swarm = models.ForeignKey(SwarmCluster)
     createDate = models.DateTimeField(auto_now=True)

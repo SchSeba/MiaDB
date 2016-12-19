@@ -60,8 +60,6 @@ class ServiceAdmin(admin.ModelAdmin):
     search_fields = ["name"]
     list_filter = ["deployment"]
 
-    def delete_model(self, request, obj):
-        pass
 
 admin.site.register(DeployPlan,DeployPlanAdmin)
 admin.site.register(Swarm,SwarmAdmin)

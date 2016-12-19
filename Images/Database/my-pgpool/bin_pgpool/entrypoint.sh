@@ -80,4 +80,4 @@ echo ">>>>>> Result config file"
 #cat $CONFIG_FILE
 
 rm -rf /var/run/postgresql/pgpool.pid #in case file exists after urgent stop
-pgpool -n -d
+pgpool -n
