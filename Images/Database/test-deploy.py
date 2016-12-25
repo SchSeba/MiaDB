@@ -1,7 +1,7 @@
 import requests
 import json
 
-data = {"projectName":"test2",
+data = {"projectName":"test",
         "deployPlan":"postgres publish pgpool",
         "swarmCluster":"test-cluster",
         "params":{"POSTGRES_USER":"testuser",

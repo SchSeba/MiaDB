@@ -47,6 +47,27 @@ class DockerService():
         return serviceIDs
 
 
+    def StartService(self,dockerServicesCommand):
+        logger.info("Creating services")
+        serviceIDs = []
+        for service in dockerServicesCommand:
+
+            logger.debug("Start service name " + service["name"])
+            service = self.dockerConnector.CreateService(service)
+            serviceIDs.append(service.id)
+            logger.debug("Start successfully Service ID " + service.id)
+            Service.objects.create(deployment=self.deployment,
+                                   serviceID=service.id,
+                                   name=service.name)
+
+        return serviceIDs
+
     def RemoveServices(self):
         for service in Service.objects.filter(deployment=self.deployment):
             self.dockerConnector.RemoveService(service.serviceID)
+
+
+    def StopServices(self):
+        for service in Service.objects.filter(deployment=self.deployment):
+            self.dockerConnector.StopService(service.serviceID)
+            service.delete()

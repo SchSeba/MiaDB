@@ -107,6 +107,104 @@ def Deploy(request):
         return JsonResponse({"status": "Fail",
                              "Message": "Send only with POST"})
 
+
+"""
+projectName: Dns for the Cluster
+deployPlan: Name For the Deployment Plan
+swarmCluster: name of swarm cluster
+"""
+@csrf_exempt
+def StartDeployment(request):
+    if request.method == "POST":
+        try:
+            logger.info("Load json data")
+            data = json.loads(request.body)
+            logger.debug(data)
+
+            if SwarmCluster.objects.filter(name=data["swarmCluster"]).__len__() == 0:
+                raise Exception("Swarm Cluster doesnt exist")
+
+            elif DeployPlan.objects.filter(name=data["deployPlan"]).__len__() == 0:
+                raise Exception("DeployPlan doesnt exist")
+
+            elif Deployment.objects.filter(projectName=data["projectName"],
+                                           swarm=SwarmCluster.objects.get(name=data["swarmCluster"]),
+                                           deployPlan=DeployPlan.objects.get(name=data["deployPlan"])).__len__() == 0:
+                raise Exception("Project Doesnt exist")
+
+            else:
+                logger.debug("Get DeploymentPlan " + data["deployPlan"])
+                deployPlan = DeployPlan.objects.get(name=data["deployPlan"])
+                swarmCluster = SwarmCluster.objects.get(name=data["swarmCluster"])
+
+                deployment = Deployment.objects.get(projectName=data["projectName"],
+                                                       deployPlan=deployPlan,
+                                                       swarm=swarmCluster)
+
+                try:
+                    logger.debug("Compose Request")
+                    dockerComposer = DockerComposer()
+
+                    dockerServicesCommand = dockerComposer.GetDockerServicesCommand(deployment.renderCompose)
+
+                    dockerService = DockerService(deployment)
+                    serviceIDs = dockerService.StartService(dockerServicesCommand)
+
+                    return JsonResponse({"status": "SUCCESS",
+                                         "Message": serviceIDs})
+
+                except Exception as e:
+                    deployment.delete()
+                    logger.error(str(e.message))
+                    return JsonResponse({"status": "Fail",
+                                         "Message": str(e.message)})
+
+        except Exception as e:
+            logger.error(e.message)
+            return JsonResponse({"status": "Fail",
+                               "Message": e.message})
+    else:
+        return JsonResponse({"status": "Fail",
+                             "Message": "Send only with POST"})
+
+
+"""
+projectName: Dns for the Cluster
+deployPlan: Name For the Deployment Plan
+swarmCluster: name of swarm cluster
+"""
+@csrf_exempt
+def StopDeployment(request):
+    if request.method == "POST":
+        try:
+            logger.info("Load json data")
+            data = json.loads(request.body)
+            logger.debug(data)
+
+            deployment = Deployment.objects.filter(projectName=data["projectName"],
+                                                  swarm=SwarmCluster.objects.get(name=data["swarmCluster"]),
+                                                  deployPlan=DeployPlan.objects.get(name=data["deployPlan"]))
+
+            if deployment.__len__() != 1:
+                raise Exception("Project Doesnt exist")
+            else:
+                deployment = deployment[0]
+                deploymentName = deployment.projectName
+                dockerService = DockerService(deployment)
+                dockerService.StopServices()
+
+                return JsonResponse({"status": "SUCCESS",
+                                 "Message": "Success Stop " + deploymentName + " Deployment"})
+
+        except Exception as e:
+            logger.error(e.message)
+            return JsonResponse({"status": "Fail",
+                                 "Message": e.message})
+    else:
+        return JsonResponse({"status": "Fail",
+                             "Message": "Send only with POST"})
+
+
 """
 projectName: Dns for the Cluster
 deployPlan: Name For the Deployment Plan

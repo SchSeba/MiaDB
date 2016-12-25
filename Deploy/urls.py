@@ -17,12 +17,18 @@ from django.conf.urls import url
 from views import *
 
 urlpatterns = [
-    # url(r'GetClusterInfo/(?P<ClusterDNS>\w+)/$',Cluster.as_view(),name="GetClusterInfo"),
+
     url(r'GetDeployPlans/$',GetDeployPlans,name="GetDeployPlans"),
     url(r'GetDeployments/$',GetDeployments,name="GetDeployments"),
+
     url(r'GetDeployPlanByName/(?P<DeployPlanName>\w+)/$', GetDeployPlanByName, name="GetDeployPlan"),
     url(r'GetDeploymentByName/(?P<DeploymentByName>\w+)/$', GetDeploymentByName, name="GetDeploymentByName"),
+
     url(r'Deploy/$',Deploy,name="Deploy"),
+    url(r'StartDeployment/$',StartDeployment,name="StartDeployment"),
+
     url(r'RemoveDeployment/$',RemoveDeployment,name="RemoveDeployment"),
+    url(r'StopDeployment/$',StopDeployment,name="StopDeployment"),
+
     url(r'ScaleUP/$',ScaleUP,name="ScaleUP")
 ]

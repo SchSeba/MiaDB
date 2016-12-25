@@ -25,6 +25,7 @@ def ChangePriv():
     RunCommand("chown postgres /master")
     RunCommand("chmod 0700 /master")
 
+
 def RunRepConfigFile():
     print ("Run RepMgr_Config.sh with the follow Args")
     print ("CLUSTER_NODE_NETWORK_NAME= " + os.getenv("CLUSTER_NODE_NETWORK_NAME") +
@@ -43,7 +44,7 @@ def FirstCreation():
 
             print ("Start Master INITIAL First Time")
 
-            while RunCommand("cat /master") != os.getenv("CLUSTER_NODE_NETWORK_NAME"):
+            while not RunCommand("cat /master").__contains__(os.getenv("CLUSTER_NODE_NETWORK_NAME")):
                 print("Write hostname to master file")
                 RunCommand("echo \"" + os.getenv("CLUSTER_NODE_NETWORK_NAME") + "\"> /master")
 
@@ -55,8 +56,11 @@ def FirstCreation():
         print ("Delete files in folder: " + os.getenv("PGDATA"))
         RunCommand("rm -rf " + os.getenv("PGDATA") + "/*")
 
-        print ("INITIAL_NODE_TYPE Env: " + os.getenv("INITIAL_NODE_TYPE"))
+        print ("Delete files in folder: /var/lib/postgresql/archive")
+        RunCommand("rm -rf /var/lib/postgresql/archive/*")
 
+
+        print ("INITIAL_NODE_TYPE Env: " + os.getenv("INITIAL_NODE_TYPE"))
         if RunCommand("cat /master") == '':
             print ("Primary server not found")
             raise Exception("Primary server not found")
@@ -84,11 +88,6 @@ def FirstCreation():
     print ("Start Repmgr")
     RunCommand("gosu postgres repmgrd -vvv --pid-file=/tmp/repmgrd.pid")
 
-    #RunCommand("echo FirstCreation > $PGDATA/status")
-    # print ("communicate")
-    # (output, err) = p.communicate()
-    # print ("wait")
-    # p_status = p.wait()
 
 def RunDataBase():
     print ("Start Running database")
@@ -109,11 +108,12 @@ def RunDataBase():
 
 
 def RestartMember():
-    RunRepConfigFile()
+    #RunRepConfigFile()
 
     if RunCommand("cat /master").__contains__(os.environ["CLUSTER_NODE_NETWORK_NAME"]):
         print ("This was the master on shutdown, Start the server like master")
         os.environ["INITIAL_NODE_TYPE"] = "master"
+        RunRepConfigFile()
         RunDataBase()
 
     else:
