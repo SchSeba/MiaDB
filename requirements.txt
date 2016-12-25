@@ -9,3 +9,4 @@ requests
 docker
 tornado
 pyyaml
+pika
