@@ -95,7 +95,7 @@ def Deploy(request):
 
                 except Exception as e:
                     deployment.delete()
-                    logger.error(str(e.message))
+                    logger.error(str(e))
                     return JsonResponse({"status": "Fail",
                                          "Message": str(e.message)})
 

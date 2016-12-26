@@ -1,6 +1,9 @@
 import docker
+import os
+import shutil
 from docker.types import IPAMConfig
 from docker.types import EndpointSpec
+from MiaDB.settings import BasePath
 
 class DockerConnector():
 
@@ -54,4 +57,10 @@ class DockerConnector():
 
 
     def DeleteStorage(self,service):
-        pass
+        if service.attrs[u'Spec'][u'TaskTemplate'][u'ContainerSpec'].has_key('Mounts'):
+            for mount in service.attrs[u'Spec'][u'TaskTemplate'][u'ContainerSpec'][u'Mounts']:
+                if os.path.exists(mount["Source"]):
+                    if mount["Source"][-1] == "/":
+                        shutil.rmtree(mount["Source"])
+                    else:
+                        os.remove(mount["Source"])

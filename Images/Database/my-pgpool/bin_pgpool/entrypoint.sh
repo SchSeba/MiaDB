@@ -45,8 +45,8 @@ backend_data_directory$NUM = '$DIR'
 backend_flag$NUM = '$FLAG'
 " >> $CONFIG_FILE
 
-echo ">>> Waiting for backend  tcp://$HOST:$PORT to start pgpool"
-dockerize -wait tcp://$HOST:$PORT -timeout 250s
+#echo ">>> Waiting for backend  tcp://$HOST:$PORT to start pgpool"
+#dockerize -wait tcp://$HOST:$PORT -timeout 250s
 
 done
 
@@ -80,4 +80,11 @@ echo ">>>>>> Result config file"
 #cat $CONFIG_FILE
 
 rm -rf /var/run/postgresql/pgpool.pid #in case file exists after urgent stop
-pgpool -n
+
+PORT="5432"
+HOST=`cat master`
+
+[[ -z $HOST ]] && exit
+dockerize -wait tcp://$HOST:$PORT -timeout 250s
+
+pgpool -d -n

@@ -42,15 +42,15 @@ def FirstCreation():
     print ("Node Type " + os.getenv("INITIAL_NODE_TYPE"))
     if os.getenv("INITIAL_NODE_TYPE") == "master":
 
-            print ("Start Master INITIAL First Time")
+        print ("Start Master INITIAL First Time")
 
-            while not RunCommand("cat /master").__contains__(os.getenv("CLUSTER_NODE_NETWORK_NAME")):
-                print("Write hostname to master file")
-                RunCommand("echo \"" + os.getenv("CLUSTER_NODE_NETWORK_NAME") + "\"> /master")
+        while not RunCommand("cat /master").__contains__(os.getenv("CLUSTER_NODE_NETWORK_NAME")):
+            print("Write hostname to master file")
+            RunCommand("echo \"" + os.getenv("CLUSTER_NODE_NETWORK_NAME") + "\"> /master")
 
-            RunCommand("cp -f /usr/local/bin/cluster/primary.entrypoint.sh /docker-entrypoint-initdb.d/")
-            RunCommand("/docker-entrypoint.sh \"postgres\"")
-            p = subprocess.Popen("exec gosu postgres \"postgres\"", stdout=subprocess.PIPE, shell=True)
+        RunCommand("cp -f /usr/local/bin/cluster/primary.entrypoint.sh /docker-entrypoint-initdb.d/")
+        RunCommand("/docker-entrypoint.sh \"postgres\"")
+
 
     else:
         print ("Delete files in folder: " + os.getenv("PGDATA"))
@@ -71,9 +71,11 @@ def FirstCreation():
         print ("Run Wait_DB, Waiting for Master to go up")
         RunCommand(
             "wait_db $REPLICATION_PRIMARY_HOST $REPLICATION_PRIMARY_PORT $REPLICATION_USER $REPLICATION_PASSWORD $REPLICATION_DB")
-        p = subprocess.Popen("/usr/local/bin/cluster/standby.entrypoint.sh \"postgres\"", stdout=subprocess.PIPE,
-                         shell=True,env=os.environ)
 
+        RunCommand("/usr/local/bin/cluster/standby.entrypoint.sh \"postgres\"")
+
+    print ("Start database")
+    p = subprocess.Popen("exec gosu postgres \"postgres\"", stdout=subprocess.PIPE, shell=True)
 
     print ("Run Wait_DB, Waiting for this dataBase")
     print ("CLUSTER_NODE_NETWORK_NAME= " + os.getenv("CLUSTER_NODE_NETWORK_NAME"))
@@ -81,7 +83,9 @@ def FirstCreation():
     print ("End WaitDB")
 
     print ("Register to Repmgr as " + os.getenv("INITIAL_NODE_TYPE"))
-    RunCommand("gosu postgres repmgr $INITIAL_NODE_TYPE register --force")
+    if not os.getenv("INITIAL_NODE_TYPE") == "master":
+        RunCommand("gosu postgres repmgr $INITIAL_NODE_TYPE register --force --log-level DEBUG --verbose")
+
     RunCommand("gosu postgres repmgr cluster show")
     RunCommand("rm -rf /tmp/repmgrd.pid")
 
@@ -114,6 +118,7 @@ def RestartMember():
         print ("This was the master on shutdown, Start the server like master")
         os.environ["INITIAL_NODE_TYPE"] = "master"
         RunRepConfigFile()
+
         RunDataBase()
 
     else:
