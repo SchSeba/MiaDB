@@ -5,6 +5,7 @@ services:
      image: my-rabbitmq
      env:
       - ERLANG_COOKIE=abcdefg
+      - HOSTNAME={{projectName}}rabbitmq{{SERVICE_COUNT}}
 
      mounts:
        - data:
@@ -20,6 +21,7 @@ services:
      env:
       - ERLANG_COOKIE=abcdefg
       - CLUSTER_WITH={{projectName}}rabbitmq1
+      - HOSTNAME={{projectName}}rabbitmq{{SERVICE_COUNT}}
      mounts:
        - data:
          source: "{{BasePath}}/{{projectName}}/rabbitmq{{SERVICE_COUNT}}/"

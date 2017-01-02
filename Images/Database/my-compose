@@ -107,14 +107,10 @@ services:
         source: "{{BasePath}}/{{projectName}}/master"
         target: "/master"
         type: "bind"
+
      publish:
       - 5432:5432
       - 9898:9898
-
-     mode:
-      Replicated:
-       Replicas: 2
-
 
      name: {{projectName}}pgpool
 
